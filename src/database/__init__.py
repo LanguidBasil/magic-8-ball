@@ -3,7 +3,7 @@ import asyncio
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from config import DATABASE_URL
-from database._models import Base, Profile
+from database._models import Base, Question, User
 
 
 engine = create_async_engine(DATABASE_URL)
@@ -19,5 +19,6 @@ asyncio.ensure_future(create_tables())
 
 __all__ = [
     "session_maker",
-    "Profile",
+    "Question",
+    "User",
 ]

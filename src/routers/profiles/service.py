@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from database import session_maker, Profile
+from database import session_maker, User
 from routers.profiles.schemas import (
     GetProfiles_QuerySortField,
     GetProfiles_QuerySortOrder,
@@ -8,12 +8,12 @@ from routers.profiles.schemas import (
 ) 
 
 
-async def get_profile__get_profile(profile_id: str) -> Profile | None:
+async def get_profile__get_profile(profile_id: str) -> User | None:
     
     async with session_maker.begin() as session:
         res = (await session.execute(
-            select(Profile).
-            where(Profile.id == profile_id)
+            select(User).
+            where(User.id == profile_id)
         )).scalar()
         return res
     
@@ -23,18 +23,18 @@ async def get_profiles__get_profiles(
         results_per_page: int,
         sort_field: GetProfiles_QuerySortField,
         sort_order: GetProfiles_QuerySortOrder,
-    ) -> list[Profile]:
+    ) -> list[User]:
     
     query = (
-        select(Profile).
+        select(User).
         offset((page - 1) * results_per_page).
         limit(results_per_page)
     )
     
     if sort_field != GetProfiles_QuerySortField.none:
         column_sort_mapping = {
-            GetProfiles_QuerySortField.full_name: Profile.full_name,
-            GetProfiles_QuerySortField.creation_date: Profile.creation_date,
+            GetProfiles_QuerySortField.full_name: User.full_name,
+            GetProfiles_QuerySortField.creation_date: User.creation_date,
         }
         column_to_sort = column_sort_mapping[sort_field]
         if sort_order == GetProfiles_QuerySortOrder.descending:
@@ -47,9 +47,9 @@ async def get_profiles__get_profiles(
         return list((await session.execute(query)).scalars())
 
 
-async def create_profile__create_profile(body: CreateProfile_Body) -> Profile:
+async def create_profile__create_profile(body: CreateProfile_Body) -> User:
     
-    p = Profile(full_name = body.full_name)
+    p = User(full_name = body.full_name)
     
     async with session_maker.begin() as session:
         session.add(p)
