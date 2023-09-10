@@ -4,7 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from asgi_correlation_id import CorrelationIdMiddleware, CorrelationIdFilter
 
-from routers.profiles.router import router as profiles_router
+from routers.users.router import router as users_router
+from routers.questions.router import router as questions_router
 from routers.logging.router import router as logging_router
 
 
@@ -43,7 +44,8 @@ def configure_loggers():
 configure_loggers()
 
 
-app_api_v1.include_router(profiles_router, tags=["Profiles"])
+app_api_v1.include_router(users_router, tags=["Users"])
+app_api_v1.include_router(questions_router, tags=["Questions"])
 app_api_v1.include_router(logging_router,  tags=["Loggging"])
 
 
