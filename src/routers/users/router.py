@@ -54,7 +54,11 @@ async def create_user(body: Post_Body):
 @router.post(
     "/{user_id}/ask", 
     response_model=PostAsk_Response,
-    description="Will create question if not exists otherwise add to history",
+    description="""
+Will create question if not exists otherwise add to history
+
+Will strip whitespaces, make every character lower case and remove all characters except unicode letters and spaces
+""",
 )
 async def user_ask(
         user_id: int,

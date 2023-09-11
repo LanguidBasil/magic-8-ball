@@ -1,19 +1,24 @@
+import re
 from datetime import datetime
 
-from pydantic import BaseModel, Field, EmailStr, conint, constr
+from pydantic import BaseModel, field_validator, Field, EmailStr, conint, constr
 
 from database import User, Question
 
 
-_r_any_unicode_character_and_space = "[\p{L}\p{M}* ]"
+_r_only_words_and_space = r"[^\w ]"
 
-class PostAsk_Body(BaseModel):    
+class PostAsk_Body(BaseModel):
     # pattern is for any unicode character and space
     text: constr(
         strip_whitespace=True, 
         to_lower=True, 
-        pattern=_r_any_unicode_character_and_space
     ) = Field(examples=["Найду ли я настоящую любовь?"])
+    
+    @field_validator("text")
+    @classmethod
+    def format_text(cls, value: str):
+        return re.sub(_r_only_words_and_space, "", value, flags=re.UNICODE)
 
 class PostAsk_Response(BaseModel):
     id: conint(strict=True, ge=1)
@@ -22,9 +27,13 @@ class PostAsk_Response(BaseModel):
     text: constr(
         strip_whitespace=True, 
         to_lower=True, 
-        pattern=_r_any_unicode_character_and_space
     ) = Field(examples=["Абсолютно точно"])
     total_voices: conint(strict=True, ge=1)
+    
+    @field_validator("text")
+    @classmethod
+    def format_text(cls, value: str):
+        return re.sub(_r_only_words_and_space, "", value, flags=re.UNICODE)
     
     def __init__(self, question: Question, total_voices: int, **kwargs):
         super().__init__(
