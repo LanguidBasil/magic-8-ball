@@ -4,8 +4,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, field_validator, Field, EmailStr, conint, constr
 
-from database import User, Question
 from config import ANSWER_OPTIONS
+from api.database import User, Question
 
 
 _r_only_words_and_space = r"[^\w ]"

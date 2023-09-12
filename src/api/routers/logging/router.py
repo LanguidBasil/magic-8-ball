@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import PlainTextResponse
 
 from config import APP_LOGS_PATH
-from routers._utils.schemas import make_dependable
-from routers.logging.schemas import GetLogs_Query
+from api.utils.schemas import make_dependable
+from api.routers.logging.schemas import GetLogs_Query
 
 
 router = APIRouter(prefix="/logging")

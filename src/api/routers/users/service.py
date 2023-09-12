@@ -1,6 +1,6 @@
 from sqlalchemy import select, insert, func
 
-from database import session_maker, User, Question, questions_asked_table
+from api.database import session_maker, User, Question, questions_asked_table
 
 
 async def _get_user_with_questions_and_total_asked(

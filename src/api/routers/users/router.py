@@ -3,8 +3,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from routers._utils.schemas import make_dependable
-from routers.users.schemas import (
+from api.utils.schemas import make_dependable
+from api.routers.users.schemas import (
     GetByEmail_Query,
     Get_Response, 
     Post_Body,
@@ -12,7 +12,7 @@ from routers.users.schemas import (
     PostAsk_Body,
     PostAsk_Response,
 ) 
-from routers.users.service import (
+from api.routers.users.service import (
     get_user_by_id as s_get_user_by_id,
     get_user_by_email as s_get_user_by_email,
     create_user as s_create_user,
