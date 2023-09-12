@@ -1,6 +1,6 @@
 import re
 
-from pydantic import BaseModel, ValidationError, constr, model_validator, field_validator
+from pydantic import BaseModel, constr, model_validator, field_validator
 
 
 class GetLogs_Query(BaseModel):
