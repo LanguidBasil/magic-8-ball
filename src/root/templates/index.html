@@ -6,7 +6,7 @@
     <title>Узнай свою судьбу</title>
 
     <style>
-        /* Style for the login popup */
+        /* login popup */
         .popup {
             display: none;
             position: fixed;
@@ -29,7 +29,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         }
 
-        /* Style for the main container */
+        /* main container */
         .container {
             text-align: center;
             max-width: 600px;
@@ -42,7 +42,7 @@
             margin-bottom: 20px;
         }
 
-        /* Style for the Magic 8 Ball */
+        /* Magic 8 Ball */
         .magic-8-ball {
             background: #f0f0f0;
             border: 2px solid #333;
@@ -57,12 +57,12 @@
             font-size: 18px;
         }
 
-        #answer {
+        .magic-8-ball > #answer {
             font-weight: bold;
             margin: 20px 0;
         }
 
-        #shake-button {
+        .magic-8-ball > #shake-button {
             background: #007bff;
             color: #fff;
             border: none;
@@ -72,36 +72,16 @@
             cursor: pointer;
         }
 
-        #shake-button:hover {
+        .magic-8-ball > #shake-button:hover {
             background: #0056b3;
         }
 
-        /* Style for the User's Questions History */
-        .history {
-            text-align: left;
-            margin-top: 20px;
-        }
-
-        h2 {
-            font-size: 24px;
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        li {
-            font-size: 16px;
-            margin: 10px 0;
-        }
-
-        /* Style for the User Input Box */
+        /* User Input Box */
         .user-input {
             margin-top: 20px;
         }
 
-        #user-question {
+        .user-input > #user-question {
             width: 100%;
             padding: 10px;
             font-size: 16px;
@@ -109,7 +89,7 @@
             border-radius: 5px;
         }
 
-        #ask-button {
+        .user-input > #ask-button {
             background: #007bff;
             color: #fff;
             border: none;
@@ -119,8 +99,43 @@
             cursor: pointer;
         }
 
-        #ask-button:hover {
+        .user-input > #ask-button:hover {
             background: #0056b3;
+        }
+
+        /* User's Questions History */
+        .history {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .history h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .history .question-list {
+            padding: 0.2rem;
+        
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .history .question-list > * {
+            flex: 1;
+        }
+        
+        .history section {
+            padding: 1rem;
+        }
+        
+        .history .child {
+            border: 3px solid;
+            border-radius: 10px;
+            padding: 0.5rem;
+            background: hsl(230, 75%, 25%);
+            color: #f0f0f0;
         }
 
     </style>
@@ -145,100 +160,115 @@
             <button id="shake-button">коснись</button>
         </div>
 
-        <div class="history">
-            <h2>Question History</h2>
-            <ul id="question-list"></ul>
+        <div class="user-input">
+            <textarea id="user-question" rows="4" placeholder="Спроси меня..."></textarea>
         </div>
 
-        <div class="user-input">
-            <textarea id="user-question" rows="4" placeholder="Ask a yes/no question..."></textarea>
-            <button id="ask-button">Ask</button>
+        <div class="history">
+            <h2>Question History</h2>
+            <section>
+                <div class="question-list">
+                    <!-- <div class="child">lorem ipsum</div> -->
+                </div>
+            </section>
         </div>
     </div>
 
     <script>
-        
-        document.addEventListener("DOMContentLoaded", async () => {
-            // Elements
-            const loginButton = document.getElementById("login-button");
-            const loginPopup = document.getElementById("login-popup");
-            const loginForm = document.getElementById("login-form");
 
-            loginForm.addEventListener("submit", async (e) => {
-                e.preventDefault();
+        function addQuestion(text, totalVoices) {
+            const questionList = document.getElementsByClassName("question-list")[0];
+            for (const c of questionList.children) {
+                const cQuestionOnly = c.innerHTML.substring(0, c.innerHTML.indexOf(" <br>"));
+                if (cQuestionOnly == text) {
+                    return;
+                }
+            }
 
-                // You can implement actual login logic here
-                const email = loginForm.elements["email"];
-                const user = await fetch(
-                    "/api/v1/login"
-                )
+            const question = document.createElement("div");
+            question.className = "child";
+            question.innerHTML = `${text} <br>${totalVoices} пользователей спросило`;
 
-                loginPopup.style.display = "none";
-            });
+            questionList.appendChild(question);
+        }
+
+
+        let user = null;
+
+
+        // login / register user and display questions
+        document.getElementById("login-form").addEventListener("submit", async e => {
+            e.preventDefault();
+
+            // login / register user
+            const email = e.target.elements["email"].value;
+            const response = await fetch(
+                `/api/v1/users?email=${email}`,
+            );
+            if (!response.ok) {
+                console.log("Invalid email");
+                return;
+            }
+
+            user = await response.json();
+            if (user == null) {
+                const response = await fetch(
+                    "/api/v1/users",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            email: email,
+                        }),
+                    },
+                );
+                if (!response.ok) {
+                    return;
+                }
+
+                user = await response.json();
+                user.questions = [];
+
+                console.log(`welcome ${user.email}`);
+            }
+            else {
+                console.log(`hi there ${user.email}`);
+            }
+
+            // display questions
+            for (const q of user.questions) {
+                addQuestion(q.text, q.total_voices);
+            }
+
+            // close popup
+            document.getElementById("login-popup").style.display = "none";
         });
         
-        document.addEventListener("DOMContentLoaded", async () => {
-            // Elements (continued)
-            const shakeButton = document.getElementById("shake-button");
-            const answerDiv = document.getElementById("answer");
-            const userQuestionInput = document.getElementById("user-question");
-            const askButton = document.getElementById("ask-button");
-            const questionList = document.getElementById("question-list");
-
-            // Magic 8 Ball responses
-            const responses = [
-                "It is certain.",
-                "It is decidedly so.",
-                "Without a doubt.",
-                "Yes – definitely.",
-                "You may rely on it.",
-                "As I see it, yes.",
-                "Most likely.",
-                "Outlook good.",
-                "Yes.",
-                "Signs point to yes.",
-                "Reply hazy, try again.",
-                "Ask again later.",
-                "Better not tell you now.",
-                "Cannot predict now.",
-                "Concentrate and ask again.",
-                "Don't count on it.",
-                "My reply is no.",
-                "My sources say no.",
-                "Outlook not so good.",
-                "Very doubtful."
-            ];
-
-            // Function to get a random response from the Magic 8 Ball
-            function getRandomResponse() {
-                const randomIndex = Math.floor(Math.random() * responses.length);
-                return responses[randomIndex];
+        // handle answering
+        document.getElementById("shake-button").addEventListener("click", async () => {
+            const response = await fetch(
+                `/api/v1/users/${user.id}/ask`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        text: document.getElementById("user-question").value,
+                    }),
+                },
+            );
+            if (!response.ok) {
+                return;
             }
 
-            // Function to display the Magic 8 Ball answer
-            function displayAnswer() {
-                const answer = getRandomResponse();
-                answerDiv.textContent = answer;
-            }
-
-            // Function to add a question to the history list
-            function addQuestionToHistory(question) {
-                const listItem = document.createElement("li");
-                listItem.textContent = question;
-                questionList.appendChild(listItem);
-            }
-
-            // Event listeners for Magic 8 Ball and question history
-            shakeButton.addEventListener("click", displayAnswer);
-
-            askButton.addEventListener("click", function () {
-                const question = userQuestionInput.value.trim();
-                if (question) {
-                    displayAnswer();
-                    addQuestionToHistory(question);
-                    userQuestionInput.value = "";
-                }
-            });
+            const body = await response.json();
+            document.getElementById("answer").textContent = body.answer;
+            addQuestion(body.question.text, body.question.total_voices);
         });
 
     </script>
