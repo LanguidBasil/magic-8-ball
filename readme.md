@@ -1,3 +1,8 @@
+# Softorium Test Task
+
+[Изображение в docker hub](https://hub.docker.com/repository/docker/languidbasil/softorium-test-task/general)
+с инструкцией по использованию
+
 Приложение одностраничное, с рендерингом на стороне клиента
 
 Возникшие сложности при решении задания:
