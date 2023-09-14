@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     
     <title>Узнай свою судьбу</title>
 
@@ -204,7 +205,7 @@
             // login / register user
             const email = e.target.elements["email"].value;
             const response = await fetch(
-                `${window.location.origin}/api/v1/users?email=${email}`,
+                `/api/v1/users?email=${email}`,
             );
             if (!response.ok) {
                 console.log("Invalid email");
@@ -214,7 +215,7 @@
             user = await response.json();
             if (user == null) {
                 const response = await fetch(
-                    "${window.location.origin}/api/v1/users",
+                    "/api/v1/users",
                     {
                         method: "POST",
                         headers: {
@@ -251,7 +252,7 @@
         // handle answering
         document.getElementById("shake-button").addEventListener("click", async () => {
             const response = await fetch(
-                `${window.location.origin}/api/v1/users/${user.id}/ask`,
+                `/api/v1/users/${user.id}/ask`,
                 {
                     method: "POST",
                     headers: {
